@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>MAHIR BR UDP — Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+:root{
+  --bg:#080d18;
+  --bg-side:#060a12;
+  --card:#0d1420;
+  --card-2:#101828;
+  --line:rgba(255,255,255,.06);
+  --line-2:rgba(255,255,255,.1);
+
+  --cyan:#06b6d4;
+  --cyan-2:#22d3ee;
+  --cyan-3:#67e8f9;
+
+  --purple:#a855f7;
+  --purple-2:#c084fc;
+
+  --blue:#3b82f6;
+  --blue-2:#60a5fa;
+
+  --emerald:#10b981;
+  --emerald-2:#34d399;
+
+  --amber:#f59e0b;
+  --amber-2:#fbbf24;
+
+  --rose:#f43f5e;
+  --rose-2:#fb7185;
+
+  --t-0:#f8fafc;
+  --t-1:#cbd5e1;
+  --t-2:#94a3b8;
+  --t-3:#64748b;
+  --t-4:#475569;
+
+  --r:12px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--t-0);min-height:100vh;overflow-x:hidden}
+body{display:flex;min-height:100vh}
+
+::selection{background:rgba(34,211,238,.4)}
+
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(34,211,238,.3);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(34,211,238,.5)}
+
+/* ============================================================
+   SIDEBAR
+============================================================ */
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--bg-side);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+  padding:20px 14px;
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;
+}
+
+.brand{
+  display:flex;align-items:center;gap:12px;
+  padding:8px 10px 20px;
+  margin-bottom:8px;
+  border-bottom:1px solid var(--line);
+}
+.brand-logo{
+  width:42px;height:42px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  display:grid;place-items:center;
+  font-size:20px;color:#00131a;font-weight:900;
+  box-shadow:0 4px 20px rgba(6,182,212,.5),inset 0 1px 0 rgba(255,255,255,.3);
+}
+.brand-name{
+  font-size:14.5px;font-weight:800;letter-spacing:-.2px;line-height:1.15;
+  color:#fff;
+}
+.brand-status{
+  font-size:10.5px;color:var(--t-3);font-weight:500;
+  display:flex;align-items:center;gap:5px;margin-top:3px;
+}
+.brand-status .dot{
+  width:5px;height:5px;border-radius:50%;background:var(--emerald);
+  box-shadow:0 0 8px var(--emerald);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+.nav{display:flex;flex-direction:column;gap:2px;flex:1;padding-top:8px}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;border-radius:10px;
+  color:var(--t-2);font-size:13px;font-weight:600;
+  cursor:pointer;transition:.2s;
+  border:1px solid transparent;
+  background:transparent;
+  text-align:left;width:100%;
+}
+.nav-item i{font-size:14px;width:18px;text-align:center;transition:.2s}
+.nav-item:hover{background:rgba(255,255,255,.03);color:var(--t-0)}
+.nav-item.active{
+  background:linear-gradient(135deg,rgba(6,182,212,.15),rgba(59,130,246,.08));
+  color:var(--cyan-2);
+  border-color:rgba(6,182,212,.3);
+  box-shadow:0 4px 16px rgba(6,182,212,.15),inset 0 1px 0 rgba(255,255,255,.05);
+}
+.nav-item.active i{color:var(--cyan-2);filter:drop-shadow(0 0 6px rgba(34,211,238,.6))}
+
+.sidebar-foot{
+  padding-top:16px;border-top:1px solid var(--line);
+  font-size:10px;color:var(--t-4);letter-spacing:.5px;
+  text-align:center;font-weight:600;
+}
+
+/* ============================================================
+   MAIN
+============================================================ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+
+/* ============= TOPBAR ============= */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;gap:16px;
+  padding:16px 26px;
+  background:rgba(8,13,24,.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--line);
+}
+.search-cmd{
+  flex:1;max-width:560px;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:10px;
+  background:var(--card);border:1px solid var(--line);
+  cursor:pointer;transition:.2s;color:var(--t-3);font-size:13px;
+}
+.search-cmd:hover{border-color:var(--line-2);background:var(--card-2)}
+.search-cmd kbd{
+  margin-left:auto;padding:2px 7px;border-radius:6px;
+  background:rgba(255,255,255,.05);border:1px solid var(--line);
+  color:var(--t-3);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+}
+
+.top-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.icon-btn{
+  width:40px;height:40px;border-radius:10px;
+  border:1px solid var(--line);background:var(--card);
+  color:var(--t-2);cursor:pointer;transition:.2s;
+  display:grid;place-items:center;font-size:14px;
+}
+.icon-btn:hover{background:var(--card-2);color:var(--t-0);border-color:var(--line-2)}
+.icon-btn.active{
+  background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(59,130,246,.15));
+  border-color:rgba(6,182,212,.45);color:var(--cyan-2);
+  box-shadow:0 0 16px rgba(6,182,212,.25);
+}
+.icon-btn.active i{animation:spin 2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 16px;border-radius:10px;
+  border:1px solid var(--line);background:var(--card);
+  color:var(--t-1);font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:.2s;white-space:nowrap;
+}
+.btn:hover{background:var(--card-2);color:var(--t-0);border-color:var(--line-2)}
+.btn.primary{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  border-color:transparent;color:#001018;font-weight:700;
+  box-shadow:0 4px 20px rgba(6,182,212,.4);
+}
+.btn.primary:hover{box-shadow:0 8px 28px rgba(6,182,212,.55);transform:translateY(-1px);color:#001018}
+
+/* ============= CONTENT ============= */
+.content{flex:1;padding:24px 26px 40px;max-width:1600px;width:100%;margin:0 auto}
+
+/* ============= STATS ============= */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat{
+  padding:18px;border-radius:14px;
+  background:var(--card);
+  border:1px solid var(--line);
+  transition:.25s;
+  animation:cardIn .5s cubic-bezier(.2,.9,.2,1) backwards;
+  position:relative;overflow:hidden;
+}
+.stat:nth-child(1){animation-delay:.05s}
+.stat:nth-child(2){animation-delay:.1s}
+.stat:nth-child(3){animation-delay:.15s}
+.stat:nth-child(4){animation-delay:.2s}
+@keyframes cardIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
+.stat:hover{border-color:var(--line-2);transform:translateY(-2px)}
+.stat::before{
+  content:"";position:absolute;top:-30px;right:-30px;
+  width:120px;height:120px;border-radius:50%;
+  background:var(--accent,var(--cyan));filter:blur(50px);opacity:.15;pointer-events:none;
+}
+.stat.cyan{--accent:#06b6d4}
+.stat.purple{--accent:#a855f7}
+.stat.emerald{--accent:#10b981}
+.stat.amber{--accent:#f59e0b}
+
+.stat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;z-index:1}
+.stat-ic{
+  width:38px;height:38px;border-radius:10px;
+  display:grid;place-items:center;font-size:15px;
+  background:var(--ic-bg,rgba(6,182,212,.15));
+  color:var(--ic-color,#22d3ee);
+  border:1px solid var(--ic-brd,rgba(6,182,212,.3));
+}
+.stat.cyan .stat-ic{--ic-bg:rgba(6,182,212,.15);--ic-color:#22d3ee;--ic-brd:rgba(6,182,212,.3)}
+.stat.purple .stat-ic{--ic-bg:rgba(168,85,247,.15);--ic-color:#c084fc;--ic-brd:rgba(168,85,247,.3)}
+.stat.emerald .stat-ic{--ic-bg:rgba(16,185,129,.15);--ic-color:#34d399;--ic-brd:rgba(16,185,129,.3)}
+.stat.amber .stat-ic{--ic-bg:rgba(245,158,11,.15);--ic-color:#fbbf24;--ic-brd:rgba(245,158,11,.3)}
+
+.stat-live{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:800;letter-spacing:.6px;
+  color:var(--emerald-2);text-transform:uppercase;
+}
+.stat-live .dot{
+  width:6px;height:6px;border-radius:50%;background:var(--emerald);
+  box-shadow:0 0 8px var(--emerald);animation:pulse 1.6s infinite;
+}
+.stat-label{
+  font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--t-3);margin-bottom:10px;position:relative;z-index:1;
+}
+.stat-value{
+  font-size:30px;font-weight:800;letter-spacing:-1px;
+  line-height:1;color:var(--t-0);font-variant-numeric:tabular-nums;
+  position:relative;z-index:1;
+}
+.stat-foot{
+  margin-top:10px;font-size:11px;color:var(--t-3);font-weight:500;
+  position:relative;z-index:1;
+}
+
+/* ============= PANELS ============= */
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:20px;
+  animation:cardIn .6s cubic-bezier(.2,.9,.2,1);
+}
+.panel-head{
+  padding:18px 22px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.panel-title{display:flex;align-items:center;gap:12px;min-width:0}
+.panel-ic{
+  width:38px;height:38px;border-radius:10px;
+  display:grid;place-items:center;font-size:14px;
+  background:linear-gradient(135deg,rgba(6,182,212,.18),rgba(59,130,246,.1));
+  color:var(--cyan-2);border:1px solid rgba(6,182,212,.3);
+  flex-shrink:0;
+}
+.panel-title h2{
+  font-size:15px;font-weight:700;letter-spacing:-.2px;
+  display:flex;align-items:center;gap:10px;
+}
+.pill{
+  padding:3px 9px;border-radius:100px;font-size:10px;font-weight:800;
+  font-family:'JetBrains Mono',monospace;letter-spacing:.5px;
+  background:rgba(6,182,212,.12);color:var(--cyan-2);
+  border:1px solid rgba(6,182,212,.3);
+}
+.panel-actions{display:flex;align-items:center;gap:8px}
+
+/* ============= TOOLBAR ============= */
+.toolbar{
+  padding:14px 22px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  border-bottom:1px solid var(--line);
+}
+.search-field{flex:1;min-width:180px;position:relative}
+.search-field i{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  color:var(--t-4);font-size:12px;transition:.2s;
+}
+.search-field input{
+  width:100%;padding:11px 14px 11px 38px;border-radius:10px;
+  background:var(--bg);border:1px solid var(--line);
+  color:var(--t-0);font-size:12.5px;outline:none;transition:.2s;
+}
+.search-field input:focus{
+  border-color:rgba(6,182,212,.5);
+  box-shadow:0 0 0 3px rgba(6,182,212,.12);
+}
+.search-field:focus-within i{color:var(--cyan-2)}
+.search-field input::placeholder{color:var(--t-4)}
+
+.filters{display:inline-flex;gap:4px;padding:4px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.filters button{
+  border:0;background:transparent;color:var(--t-3);
+  padding:7px 12px;border-radius:7px;cursor:pointer;
+  font-size:11px;font-weight:700;letter-spacing:.4px;transition:.2s;
+}
+.filters button:hover{color:var(--t-1)}
+.filters button.active{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  color:#001018;font-weight:800;
+  box-shadow:0 3px 12px rgba(6,182,212,.4);
+}
+
+.sort-select{
+  padding:11px 12px;border-radius:10px;
+  background:var(--bg);border:1px solid var(--line);
+  color:var(--t-1);font-size:12px;font-weight:600;cursor:pointer;outline:none;
+  appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;
+}
+.sort-select:focus{border-color:rgba(6,182,212,.5)}
+.sort-select option{background:var(--card)}
+
+/* ============= ACCOUNT CARDS ============= */
+.accounts{
+  padding:18px;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:14px;
+  max-height:calc(100vh - 480px);overflow-y:auto;
+}
+
+.acc{
+  position:relative;padding:18px;
+  border-radius:12px;
+  background:linear-gradient(160deg,rgba(255,255,255,.02),rgba(255,255,255,.005));
+  border:1px solid var(--line);
+  transition:.25s;overflow:hidden;
+  animation:accIn .4s cubic-bezier(.2,.9,.2,1) backwards;
+}
+@keyframes accIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.acc::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--cyan),var(--blue));
+  box-shadow:0 0 14px var(--cyan);
+}
+.acc:hover{
+  border-color:rgba(6,182,212,.4);
+  transform:translateY(-3px);
+  box-shadow:0 16px 40px rgba(0,0,0,.5),0 0 30px rgba(6,182,212,.12);
+}
+.acc.paused::before{background:linear-gradient(180deg,var(--amber),#d97706);box-shadow:0 0 14px var(--amber)}
+.acc.match::before{background:linear-gradient(180deg,var(--cyan),var(--purple));box-shadow:0 0 14px var(--cyan);animation:barPulse 2s ease-in-out infinite}
+@keyframes barPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.acc.error::before{background:linear-gradient(180deg,var(--rose),#9f1239);box-shadow:0 0 14px var(--rose)}
+
+.acc-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.acc-av{
+  position:relative;width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  display:grid;place-items:center;font-size:20px;color:#001018;
+  box-shadow:0 6px 18px rgba(6,182,212,.45),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:.3s;
+}
+.acc:hover .acc-av{transform:rotate(-5deg) scale(1.05)}
+.acc-av .lvl{
+  position:absolute;right:-6px;bottom:-6px;
+  padding:3px 8px;border-radius:7px;font-size:10px;font-weight:800;
+  font-family:'JetBrains Mono',monospace;color:#001018;
+  background:linear-gradient(135deg,var(--cyan-3),var(--cyan));
+  border:2px solid var(--bg);
+  box-shadow:0 0 12px rgba(34,211,238,.6);
+}
+.acc-info{flex:1;min-width:0}
+
+.acc-name{
+  font-size:14px;font-weight:700;color:var(--t-0);
+  display:flex;align-items:center;gap:7px;margin-bottom:7px;
+  flex-wrap:wrap;min-width:0;
+}
+.acc-name .nick{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex-shrink:1;min-width:0;
+}
+.region-tag{
+  font-size:9.5px;font-weight:800;letter-spacing:.6px;
+  padding:2px 7px;border-radius:5px;
+  background:rgba(168,85,247,.12);color:var(--purple-2);
+  border:1px solid rgba(168,85,247,.3);
+  flex-shrink:0;
+}
+.uid-inline{
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;
+  color:var(--cyan-2);letter-spacing:.3px;white-space:nowrap;
+  padding:2px 8px;border-radius:5px;
+  background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.3);
+  flex-shrink:0;
+}
+.uid-inline-copy{
+  background:transparent;border:0;color:var(--t-4);cursor:pointer;
+  padding:3px 5px;border-radius:5px;transition:.2s;font-size:10px;flex-shrink:0;
+}
+.uid-inline-copy:hover{color:var(--cyan-2);background:rgba(6,182,212,.15);transform:scale(1.1)}
+.uid-inline-copy.copied{color:var(--emerald-2);background:rgba(16,185,129,.2)}
+
+.acc-status{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:100px;
+  font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  background:rgba(0,0,0,.3);border:1px solid currentColor;
+}
+.acc-status .sdot{
+  width:6px;height:6px;border-radius:50%;background:currentColor;
+  box-shadow:0 0 8px currentColor;animation:pulse 1.5s infinite;
+}
+.s-online{color:var(--emerald-2)}
+.s-match{color:var(--cyan-2)}
+.s-search{color:var(--amber-2)}
+.s-paused{color:var(--amber-2)}
+.s-error{color:var(--rose-2)}
+
+/* ===== UID PANEL ===== */
+.uid-panel{
+  padding:12px 14px;border-radius:10px;margin-bottom:14px;
+  background:rgba(6,182,212,.05);
+  border:1px solid rgba(6,182,212,.2);
+  position:relative;overflow:hidden;
+}
+.uid-row{
+  display:flex;align-items:center;gap:10px;margin-bottom:8px;
+}
+.uid-row:last-child{margin-bottom:0}
+.uid-icon{
+  width:24px;height:24px;border-radius:6px;flex-shrink:0;
+  display:grid;place-items:center;font-size:10px;
+  background:rgba(6,182,212,.18);color:var(--cyan-2);
+  border:1px solid rgba(6,182,212,.35);
+}
+.uid-row.guest .uid-icon{background:rgba(59,130,246,.18);color:var(--blue-2);border-color:rgba(59,130,246,.35)}
+.uid-row.pass .uid-icon{background:rgba(245,158,11,.15);color:var(--amber-2);border-color:rgba(245,158,11,.3)}
+.uid-label{
+  font-size:9.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--t-3);flex-shrink:0;min-width:48px;
+}
+.uid-value{
+  flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+  color:var(--t-0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.uid-row.guest .uid-value{color:var(--blue-2)}
+.uid-copy{
+  width:26px;height:26px;border-radius:7px;flex-shrink:0;
+  border:1px solid rgba(6,182,212,.3);background:rgba(6,182,212,.1);
+  color:var(--cyan-2);cursor:pointer;transition:.2s;
+  display:grid;place-items:center;font-size:10px;
+}
+.uid-row.guest .uid-copy{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.1);color:var(--blue-2)}
+.uid-copy:hover{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  color:#001018;border-color:transparent;transform:scale(1.1);
+}
+.uid-copy.copied{background:var(--emerald);color:#fff;border-color:transparent}
+
+/* ===== METRICS ===== */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.m-box{
+  padding:11px;border-radius:10px;
+  background:rgba(0,0,0,.3);border:1px solid var(--line);
+  transition:.2s;
+}
+.m-box:hover{border-color:rgba(6,182,212,.25);background:rgba(0,0,0,.4)}
+.m-box .l{font-size:9px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--t-4);margin-bottom:6px}
+.m-box .v{font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:700;color:var(--t-1);font-variant-numeric:tabular-nums}
+.m-box.gain .v{
+  background:linear-gradient(135deg,var(--cyan-3),var(--cyan));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+.prog{margin-bottom:14px}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:8px;font-size:10.5px;color:var(--t-3);font-weight:600}
+.prog-top b{color:var(--cyan-2);font-family:'JetBrains Mono',monospace}
+.prog-track{height:8px;border-radius:100px;background:rgba(0,0,0,.5);overflow:hidden;border:1px solid var(--line)}
+.prog-fill{
+  height:100%;border-radius:100px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  background-size:200% 100%;animation:flow 2.5s linear infinite;
+  box-shadow:0 0 12px rgba(6,182,212,.55);
+  transition:width .8s cubic-bezier(.2,.9,.2,1);
+  position:relative;
+}
+.prog-fill::after{
+  content:"";position:absolute;right:0;top:-2px;bottom:-2px;width:16px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.5));
+  filter:blur(3px);
+}
+@keyframes flow{to{background-position:200% 0}}
+.prog-bot{display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--t-4);font-family:'JetBrains Mono',monospace}
+.prog-bot .pct{color:var(--cyan-2);font-weight:800}
+
+.acc-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid var(--line)}
+.acc-time{font-size:10.5px;color:var(--t-4);display:flex;align-items:center;gap:6px}
+.acc-time strong{color:var(--cyan-2);font-family:'JetBrains Mono',monospace;font-weight:600}
+.acc-actions{display:flex;gap:6px}
+.a-btn{
+  width:34px;height:34px;border-radius:9px;
+  border:1px solid var(--line);background:var(--bg);
+  color:var(--t-3);cursor:pointer;font-size:12px;transition:.2s;
+  display:grid;place-items:center;
+}
+.a-btn:hover{background:var(--card-2);color:var(--t-0);border-color:var(--line-2);transform:translateY(-2px)}
+.a-btn.danger:hover{background:rgba(244,63,94,.15);color:var(--rose-2);border-color:rgba(244,63,94,.35)}
+.a-btn.primary:hover{background:rgba(6,182,212,.15);color:var(--cyan-2);border-color:rgba(6,182,212,.4)}
+
+/* ============= CONSOLE ============= */
+.console-panel .console-body{
+  padding:16px;max-height:400px;overflow-y:auto;
+  font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.75;
+  background:#050912;
+}
+.log{display:flex;gap:10px;margin-bottom:5px;word-break:break-word;animation:logIn .25s ease-out backwards}
+@keyframes logIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.log .t{color:var(--t-4);flex-shrink:0}
+.log .m{color:var(--t-1)}
+.log.success .m{color:var(--emerald-2);text-shadow:0 0 8px rgba(16,185,129,.3)}
+.log.warning .m{color:var(--amber-2);text-shadow:0 0 8px rgba(245,158,11,.3)}
+.log.error .m{color:var(--rose-2);text-shadow:0 0 8px rgba(244,63,94,.3)}
+.log.info .m{color:var(--cyan-2)}
+.log.match .m{color:var(--purple-2);font-weight:600;text-shadow:0 0 8px rgba(168,85,247,.4)}
+
+.console-tools{
+  padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  border-bottom:1px solid var(--line);flex-wrap:wrap;
+}
+.cfilters{display:flex;gap:4px;flex-wrap:wrap}
+.cfilter{
+  padding:6px 11px;border-radius:7px;border:1px solid transparent;
+  background:transparent;color:var(--t-3);cursor:pointer;
+  font-size:10px;font-weight:800;letter-spacing:.6px;transition:.2s;
+}
+.cfilter:hover{background:rgba(255,255,255,.03);color:var(--t-1)}
+.cfilter.active{
+  background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(59,130,246,.12));
+  color:var(--cyan-2);border-color:rgba(6,182,212,.35);
+}
+.console-foot{
+  padding:12px 20px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;color:var(--t-4);font-weight:700;letter-spacing:1px;text-transform:uppercase;
+}
+.live-tag{display:inline-flex;align-items:center;gap:6px;color:var(--emerald-2)}
+.live-tag .d{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);animation:pulse 1.4s infinite}
+
+/* ============= EMPTY ============= */
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--t-3)}
+.empty i{
+  font-size:44px;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:18px;display:block;
+}
+.empty h3{font-size:14px;color:var(--t-2);font-weight:700;margin-bottom:6px}
+.empty p{font-size:12px;color:var(--t-4);margin-bottom:20px}
+
+/* ============================================================
+   MODALS / TOASTS / PALETTE
+============================================================ */
+.overlay{
+  position:fixed;inset:0;z-index:500;display:none;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(4,8,16,.8);backdrop-filter:blur(10px);
+}
+.overlay.active{display:flex;animation:fadeIn .2s ease-out}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.modal{
+  width:100%;max-width:540px;border-radius:16px;
+  background:linear-gradient(180deg,#0f1729,#0a1120);
+  border:1px solid rgba(6,182,212,.25);
+  box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 80px rgba(6,182,212,.15);
+  animation:modalIn .3s cubic-bezier(.2,.9,.2,1);
+  max-height:calc(100vh - 40px);display:flex;flex-direction:column;
+}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:none}}
+.modal-head{
+  padding:22px 24px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.modal-head h3{font-size:16px;font-weight:700;display:flex;align-items:center;gap:10px}
+.modal-head h3 i{color:var(--cyan-2)}
+.close{
+  width:34px;height:34px;border-radius:9px;
+  border:1px solid var(--line);background:transparent;
+  color:var(--t-3);cursor:pointer;transition:.2s;
+}
+.close:hover{background:rgba(244,63,94,.15);color:var(--rose-2);border-color:rgba(244,63,94,.35);transform:rotate(90deg)}
+.modal-body{padding:20px 24px;overflow-y:auto}
+.modal-foot{
+  padding:16px 24px 22px;display:flex;justify-content:flex-end;gap:10px;
+  border-top:1px solid var(--line);background:rgba(0,0,0,.2);
+}
+
+.field{margin-bottom:16px}
+.field label{
+  display:block;font-size:10.5px;font-weight:800;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--t-3);margin-bottom:8px;
+}
+.input,.textarea,.select-i{
+  width:100%;padding:12px 14px;border-radius:10px;
+  background:var(--bg);border:1px solid var(--line);
+  color:var(--t-0);font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  outline:none;transition:.2s;
+}
+.input:focus,.textarea:focus,.select-i:focus{
+  border-color:rgba(6,182,212,.5);
+  box-shadow:0 0 0 3px rgba(6,182,212,.12);
+}
+.textarea{resize:vertical;min-height:90px}
+.select-i{
+  font-family:'Inter',sans-serif;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;
+}
+.select-i option{background:var(--card)}
+
+.cred-row{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;border-radius:10px;
+  background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.18);
+  margin-bottom:8px;transition:.2s;
+}
+.cred-row:hover{border-color:rgba(6,182,212,.35)}
+.cred-row .k{font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--t-4);min-width:76px}
+.cred-row .v{flex:1;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--t-0);word-break:break-all}
+.cred-row .reveal{
+  background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.25);
+  color:var(--cyan-2);cursor:pointer;padding:5px 8px;border-radius:7px;transition:.2s;font-size:11px;
+}
+.cred-row .reveal:hover{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#001018;border-color:transparent}
+
+.palette{
+  width:100%;max-width:600px;border-radius:16px;
+  background:linear-gradient(180deg,#0f1729,#0a1120);
+  border:1px solid rgba(6,182,212,.25);
+  box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 80px rgba(6,182,212,.15);
+  overflow:hidden;animation:modalIn .25s cubic-bezier(.2,.9,.2,1);
+  max-height:min(600px,calc(100vh - 80px));display:flex;flex-direction:column;
+}
+.palette-input{
+  width:100%;padding:18px 22px;border:0;outline:none;
+  background:transparent;color:var(--t-0);font-size:15px;
+  border-bottom:1px solid var(--line);
+}
+.palette-input::placeholder{color:var(--t-4)}
+.palette-list{overflow-y:auto;padding:8px}
+.palette-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;border-radius:9px;cursor:pointer;
+  color:var(--t-1);font-size:13px;transition:.15s;
+}
+.palette-item:hover,.palette-item.sel{
+  background:linear-gradient(135deg,rgba(6,182,212,.15),rgba(59,130,246,.1));
+  color:#fff;
+}
+.palette-item i{width:20px;text-align:center;color:var(--t-3);transition:.15s}
+.palette-item.sel i{color:var(--cyan-2)}
+
+.toasts{
+  position:fixed;top:80px;right:24px;z-index:1000;
+  display:flex;flex-direction:column;gap:10px;pointer-events:none;
+}
+.toast{
+  display:flex;align-items:center;gap:12px;
+  min-width:260px;max-width:400px;padding:14px 18px;
+  border-radius:11px;background:rgba(13,20,32,.97);
+  border:1px solid var(--line-2);backdrop-filter:blur(20px);
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+  color:var(--t-0);font-size:12.5px;font-weight:600;
+  animation:toastIn .3s cubic-bezier(.2,.9,.2,1);pointer-events:auto;
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.toast.success{border-color:rgba(16,185,129,.4)}
+.toast.success i{color:var(--emerald-2)}
+.toast.error{border-color:rgba(244,63,94,.4)}
+.toast.error i{color:var(--rose-2)}
+.toast.info{border-color:rgba(6,182,212,.4)}
+.toast.info i{color:var(--cyan-2)}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+.mobile-topbar{display:none}
+
+@media(max-width:1100px){
+  .accounts{max-height:none}
+}
+@media(max-width:900px){
+  .sidebar{
+    position:fixed;left:-260px;top:0;bottom:0;z-index:200;
+    transition:.3s cubic-bezier(.2,.9,.2,1);
+    box-shadow:4px 0 30px rgba(0,0,0,.5);
+  }
+  .sidebar.open{left:0}
+  .mobile-topbar{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 16px;background:var(--bg-side);
+    border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:100;
+  }
+  .menu-btn{
+    width:40px;height:40px;border-radius:10px;
+    border:1px solid var(--line);background:var(--card);
+    color:var(--t-1);cursor:pointer;
+    display:grid;place-items:center;
+  }
+  .mobile-topbar .brand-name{font-size:14px}
+  .search-cmd{display:none}
+  .topbar{padding:12px 16px}
+  .content{padding:16px}
+  .stats{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat{padding:14px}
+  .stat-value{font-size:22px}
+  .accounts{grid-template-columns:1fr;padding:14px}
+  .metrics{grid-template-columns:1fr 1fr}
+  .metrics .m-box:nth-child(3){grid-column:span 2}
+  .toasts{left:14px;right:14px;top:auto;bottom:20px}
+  .toast{max-width:none;min-width:0}
+  .sidebar-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:150;
+    display:none;
+  }
+  .sidebar-overlay.open{display:block}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+============================================================ -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-logo"><i class="fa-solid fa-bolt"></i></div>
+    <div>
+      <div class="brand-name">MAHIR BR UDP</div>
+      <div class="brand-status">
+        <span class="dot"></span>
+        <span id="sys-status">All Systems Operational</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item active" onclick="switchView('dashboard', this)">
+      <i class="fa-solid fa-gauge-high"></i> Dashboard
+    </button>
+    <button class="nav-item" onclick="switchView('accounts', this)">
+      <i class="fa-solid fa-users"></i> Accounts
+    </button>
+    <button class="nav-item" onclick="switchView('console', this)">
+      <i class="fa-solid fa-terminal"></i> Console
+    </button>
+    <button class="nav-item" onclick="openSettings()">
+      <i class="fa-solid fa-sliders"></i> Settings
+    </button>
+  </nav>
+
+  <div class="sidebar-foot">MAHIR BR UDP • v1.0</div>
+</aside>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- ============================================================
+     MAIN
+============================================================ -->
+<div class="main">
+
+  <!-- Mobile Topbar -->
+  <div class="mobile-topbar">
+    <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div class="brand-name">MAHIR BR UDP</div>
+  </div>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="search-cmd" onclick="openPalette()">
+      <i class="fa-solid fa-magnifying-glass" style="font-size:12px"></i>
+      <span>Search accounts, run commands…</span>
+      <kbd>Ctrl K</kbd>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn active" id="autorefresh-toggle" onclick="toggleAutoRefresh()" title="Auto-refresh">
+        <i class="fa-solid fa-rotate"></i>
+      </button>
+      <button class="icon-btn" onclick="openSettings()" title="Settings">
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+      <button class="btn" onclick="manualRefresh()">
+        <i class="fa-solid fa-arrow-rotate-right"></i> Refresh
+      </button>
+      <button class="btn primary" onclick="openAddModal()">
+        <i class="fa-solid fa-plus"></i> Add Account
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Dashboard View -->
+    <div id="view-dashboard">
+      <section class="stats">
+        <div class="stat cyan">
+          <div class="stat-head">
+            <div class="stat-ic"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-live"><span class="dot"></span>LIVE</div>
+          </div>
+          <div class="stat-label">Active Accounts</div>
+          <div class="stat-value" id="st-acc">0</div>
+          <div class="stat-foot" id="st-online">0 online</div>
+        </div>
+
+        <div class="stat purple">
+          <div class="stat-head">
+            <div class="stat-ic"><i class="fa-solid fa-rocket"></i></div>
+          </div>
+          <div class="stat-label">Matches Started</div>
+          <div class="stat-value" id="st-started">0</div>
+          <div class="stat-foot" id="st-rate">~0 / hr</div>
+        </div>
+
+        <div class="stat emerald">
+          <div class="stat-head">
+            <div class="stat-ic"><i class="fa-solid fa-arrow-trend-up"></i></div>
+          </div>
+          <div class="stat-label">Total EXP</div>
+          <div class="stat-value" id="st-exp">+0</div>
+          <div class="stat-foot" id="st-exp-rate">~0 / hr</div>
+        </div>
+
+        <div class="stat amber">
+          <div class="stat-head">
+            <div class="stat-ic"><i class="fa-solid fa-layer-group"></i></div>
+          </div>
+          <div class="stat-label">Average Level</div>
+          <div class="stat-value" id="st-avg-level">0</div>
+          <div class="stat-foot" id="st-max-level">Max L0</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Accounts Panel -->
+    <div class="panel" id="view-accounts">
+      <div class="panel-head">
+        <div class="panel-title">
+          <div class="panel-ic"><i class="fa-solid fa-layer-group"></i></div>
+          <h2>Accounts <span class="pill" id="badge-count">0</span></h2>
+        </div>
+        <div class="panel-actions">
+          <button class="btn" onclick="copyAllUids()"><i class="fa-regular fa-copy"></i> Copy UIDs</button>
+          <button class="btn" id="pause-all" onclick="togglePauseAll()"><i class="fa-solid fa-pause"></i> Pause All</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-field">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="search-input" type="text" placeholder="Search by UID, nickname…" oninput="filterAccounts()">
+        </div>
+        <div class="filters">
+          <button class="active" onclick="setFilter('all',this)">ALL</button>
+          <button onclick="setFilter('match',this)">MATCH</button>
+          <button onclick="setFilter('online',this)">ONLINE</button>
+          <button onclick="setFilter('paused',this)">PAUSED</button>
+          <button onclick="setFilter('error',this)">ERROR</button>
+        </div>
+        <select class="sort-select" id="sort-select" onchange="filterAccounts()">
+          <option value="default">Sort: Default</option>
+          <option value="level-desc">Level ↓</option>
+          <option value="level-asc">Level ↑</option>
+          <option value="gain-desc">EXP Gained ↓</option>
+          <option value="name-asc">Name A–Z</option>
+        </select>
+      </div>
+
+      <div class="accounts" id="accounts-list">
+        <div class="empty">
+          <i class="fa-solid fa-circle-notch fa-spin"></i>
+          <p>Loading accounts…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Console Panel -->
+    <div class="panel console-panel" id="view-console">
+      <div class="panel-head">
+        <div class="panel-title">
+          <div class="panel-ic"><i class="fa-solid fa-terminal"></i></div>
+          <h2>Live Console</h2>
+        </div>
+        <div class="panel-actions">
+          <button class="icon-btn" onclick="clearLogs()" title="Clear"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+
+      <div class="console-tools">
+        <div class="cfilters">
+          <button class="cfilter active" onclick="setLogFilter('all',this)">ALL</button>
+          <button class="cfilter" onclick="setLogFilter('match',this)">MATCH</button>
+          <button class="cfilter" onclick="setLogFilter('success',this)">EXP</button>
+          <button class="cfilter" onclick="setLogFilter('error',this)">ERRORS</button>
+        </div>
+        <button class="cfilter active" id="autoscroll-btn" onclick="toggleAutoScroll()" title="Auto-scroll">
+          <i class="fa-solid fa-arrows-down-to-line"></i>
+        </button>
+      </div>
+
+      <div class="console-body" id="console-stream" onscroll="handleLogScroll()"></div>
+
+      <div class="console-foot">
+        <span class="live-tag"><span class="d"></span>Live Stream</span>
+        <span>MAHIR BR UDP • V1.0</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     MODALS
+============================================================ -->
+<div class="toasts" id="toast-wrap"></div>
+
+<div class="overlay" id="add-modal" onclick="if(event.target===this)closeAddModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-user-plus"></i>Add Account</h3>
+      <button class="close" onclick="closeAddModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form onsubmit="submitAddAccount(event)">
+      <div class="modal-body">
+        <div class="field">
+          <label>Login Type</label>
+          <select class="select-i" id="acc-type" onchange="toggleFormType()">
+            <option value="guest">Guest — UID + Password</option>
+            <option value="token">Access Token</option>
+          </select>
+        </div>
+        <div id="guest-inputs">
+          <div class="field">
+            <label>Guest UID</label>
+            <input id="acc-uid" class="input" type="text" placeholder="e.g. 4311822408" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Guest Password</label>
+            <input id="acc-password" class="input" type="text" placeholder="Password" autocomplete="off">
+          </div>
+        </div>
+        <div id="token-inputs" style="display:none">
+          <div class="field">
+            <label>Access Token</label>
+            <textarea id="acc-token" class="textarea" placeholder="Paste token here…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="closeAddModal()">Cancel</button>
+        <button type="submit" class="btn primary"><i class="fa-solid fa-rocket"></i>Add & Start</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="cred-modal" onclick="if(event.target===this)closeCredModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-key"></i>Credentials</h3>
+      <button class="close" onclick="closeCredModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="cred-body"></div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeCredModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="settings-modal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-sliders"></i>Settings</h3>
+      <button class="close" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Auto-refresh Interval</label>
+        <select class="select-i" id="refresh-interval" onchange="setRefreshInterval(this.value)">
+          <option value="2">Every 2 seconds</option>
+          <option value="3" selected>Every 3 seconds</option>
+          <option value="5">Every 5 seconds</option>
+          <option value="10">Every 10 seconds</option>
+          <option value="30">Every 30 seconds</option>
+          <option value="0">Disabled</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Sound Alerts</label>
+        <select class="select-i" id="sound-alert" onchange="setSoundAlert(this.value)">
+          <option value="off">Off</option>
+          <option value="match">On Match Found</option>
+          <option value="all">On All Events</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeSettings()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="palette" onclick="if(event.target===this)closePalette()">
+  <div class="palette">
+    <input class="palette-input" id="palette-input" placeholder="Type a command…" autocomplete="off" oninput="renderPalette()">
+    <div class="palette-list" id="palette-list"></div>
+  </div>
+</div>
+
+<script>
+const EXP_TABLE = {1:0,2:48,3:202,4:544,5:1012,6:1844,7:2792,8:3800,9:4870,10:6004,11:7192,12:8448,13:9760,14:11140,15:12566,16:14060,17:15610,18:17224,19:18902,20:20632,21:22424,22:24278,23:26192,24:28166,25:30200,26:32294,27:34448,28:37804,29:41274,30:44870,31:48582,32:53394,33:58566,34:64096,35:69994,36:76460,37:83506,38:91128,39:99322,40:108092,41:120144,42:133266,43:147472,44:162760,45:179126,46:196572,47:215368,48:235516,49:257010,50:279860,51:304056,52:348318,53:394982,54:444044,55:495508,56:549364,57:633756,58:721744,59:813336,60:908522,61:1041438,62:1180352,63:1325266,64:1476184,65:1634300,66:1840946,67:2056594,68:2281242,69:2514880,70:2757530,71:3059506,72:3372284,73:3699456,74:4041030,75:4397002,76:4829104,77:5282204,78:5756304,79:6251408,80:6776502,81:7381324,82:8043154,83:8752982,84:9510808,85:10316338,86:11277190,87:12291748,88:13360304,89:14482858,90:15659418,91:17026708,92:18453950,93:19941280,94:21488570,95:23095858,96:24763138,97:26490428,98:28378704,99:30124996,100:32032884};
+
+const state = {
+  accounts: [],
+  logs: [],
+  filter: 'all',
+  logFilter: 'all',
+  autoScroll: true,
+  autoRefresh: true,
+  refreshInterval: 3000,
+  refreshTimer: null,
+  sound: 'off',
+  prevMatchCount: 0,
+  paletteItems: [],
+  paletteIndex: 0,
+  currentView: 'dashboard',
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => s==null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+const setText = (id,v) => { const el=$(id); if(el) el.innerText = v ?? ''; };
+
+function fmtDur(sec){
+  sec = Math.max(0, Math.floor(Number(sec)||0));
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  if(h>0) return `${h}h ${String(m).padStart(2,'0')}m`;
+  return `${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+}
+
+function toast(msg, type='info'){
+  const wrap = $('toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  const icons = {success:'fa-circle-check',error:'fa-triangle-exclamation',info:'fa-circle-info'};
+  t.innerHTML = `<i class="fa-solid ${icons[type]||icons.info}"></i><span>${esc(msg)}</span>`;
+  wrap.appendChild(t);
+  setTimeout(()=>{
+    t.style.transition = '.3s';
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(30px)';
+    setTimeout(()=>t.remove(), 300);
+  }, 3000);
+}
+
+async function copyText(text, label='Copied', btn=null){
+  if(!text){ toast('Nothing to copy','error'); return; }
+  try{
+    await navigator.clipboard.writeText(String(text));
+    toast(label, 'success');
+    if(btn){
+      btn.classList.add('copied');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+      setTimeout(()=>{ btn.classList.remove('copied'); btn.innerHTML = orig; }, 1200);
+    }
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = String(text);
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast(label, 'success'); }catch(_){ toast('Copy failed','error'); }
+    ta.remove();
+  }
+}
+
+function toggleSidebar(){
+  $('sidebar').classList.toggle('open');
+  $('sidebar-overlay').classList.toggle('open');
+}
+
+function switchView(view, btn){
+  state.currentView = view;
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(window.innerWidth <= 900){
+    $('sidebar').classList.remove('open');
+    $('sidebar-overlay').classList.remove('open');
+  }
+  if(view === 'dashboard'){
+    $('view-dashboard').style.display = '';
+    $('view-accounts').style.display = '';
+    $('view-console').style.display = '';
+  } else if(view === 'accounts'){
+    $('view-dashboard').style.display = 'none';
+    $('view-accounts').style.display = '';
+    $('view-console').style.display = 'none';
+  } else if(view === 'console'){
+    $('view-dashboard').style.display = 'none';
+    $('view-accounts').style.display = 'none';
+    $('view-console').style.display = '';
+  }
+}
+
+function getStatusInfo(acc){
+  const paused = !!(acc.is_paused || acc.status === 'PAUSED');
+  const st = String(acc.status || 'ONLINE').toUpperCase();
+  if(paused) return {cls:'paused', label:'PAUSED', key:'paused'};
+  if(st.includes('MATCH')) return {cls:'match', label:`IN MATCH (${acc.active_matches||1})`, key:'match'};
+  if(st.includes('SEARCH')) return {cls:'', label:'SEARCHING', key:'online'};
+  if(st === 'ERROR' || st === 'OFFLINE') return {cls:'error', label:st, key:'error'};
+  return {cls:'', label:'ONLINE', key:'online'};
+}
+
+function renderAccount(acc){
+  const uid = String(acc.uid);
+  const level = Math.max(1, parseInt(acc.level)||1);
+  const nextLvl = Math.min(100, level+1);
+  const baseExp = EXP_TABLE[level] ?? 0;
+  const targetExp = EXP_TABLE[nextLvl] ?? baseExp + 50000;
+  const needed = Math.max(1, targetExp - baseExp);
+  const curExp = Number(acc.current_exp||0);
+  const earned = Math.max(0, curExp - baseExp);
+  const remaining = Math.max(0, targetExp - curExp);
+  const pct = level >= 100 ? 100 : Math.min(100, Math.max(0, earned/needed*100));
+  const st = getStatusInfo(acc);
+
+  const region = acc.region || 'BD';
+  const nick = acc.nickname || 'Unknown';
+  const gameId = acc.uid || uid;
+  const guestUid = acc.auth_uid || '';
+  const passVal = acc.auth_password || acc.password || '';
+  const hasPass = !!passVal;
+  const hasGuest = !!guestUid && guestUid !== gameId;
+
+  const statusClass = st.key === 'match' ? 's-match'
+                    : st.key === 'paused' ? 's-paused'
+                    : st.key === 'error' ? 's-error'
+                    : st.key === 'online' && st.label.includes('SEARCH') ? 's-search'
+                    : 's-online';
+
+  return `
+  <div class="acc ${st.cls}" id="acc-${esc(uid)}" data-uid="${esc(uid)}" data-nick="${esc(nick)}" data-status="${st.key}" data-paused="${acc.is_paused?1:0}" data-level="${level}" data-gained="${acc.gained_exp||0}">
+    <div class="acc-top">
+      <div class="acc-av">
+        <i class="fa-solid fa-gamepad"></i>
+        <span class="lvl">L${level}</span>
+      </div>
+      <div class="acc-info">
+        <div class="acc-name">
+          <span class="nick">${esc(nick)}</span>
+          <span class="region-tag">${esc(region)}</span>
+          <span class="uid-inline">${esc(gameId)}</span>
+          <button class="uid-inline-copy" onclick="copyText('${esc(gameId)}','Game ID copied',this)" title="Copy Game ID">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
+        <div class="acc-status ${statusClass}">
+          <span class="sdot"></span>${esc(st.label)}
+        </div>
+      </div>
+      <button class="a-btn primary" onclick="openCredModal('${esc(uid)}')" title="Full Credentials">
+        <i class="fa-solid fa-key"></i>
+      </button>
+    </div>
+
+    <div class="uid-panel">
+      <div class="uid-row">
+        <div class="uid-icon"><i class="fa-solid fa-id-badge"></i></div>
+        <span class="uid-label">GAME</span>
+        <span class="uid-value" title="${esc(gameId)}">${esc(gameId)}</span>
+        <button class="uid-copy" onclick="copyText('${esc(gameId)}','Game ID copied',this)" title="Copy Game ID">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </div>
+      ${hasGuest ? `
+      <div class="uid-row guest">
+        <div class="uid-icon"><i class="fa-solid fa-user"></i></div>
+        <span class="uid-label">GUEST</span>
+        <span class="uid-value" title="${esc(guestUid)}">${esc(guestUid)}</span>
+        <button class="uid-copy" onclick="copyText('${esc(guestUid)}','Guest UID copied',this)" title="Copy Guest UID">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </div>` : ''}
+      <div class="uid-row pass">
+        <div class="uid-icon"><i class="fa-solid fa-lock"></i></div>
+        <span class="uid-label">PASS</span>
+        <span class="uid-value" title="${hasPass?'Password stored':'Not stored'}">${hasPass ? '••••••••' : '— not stored —'}</span>
+        <button class="uid-copy" onclick="${hasPass?`copyText('${esc(passVal)}','Password copied',this)`:`toast('Password not stored','error')`}" title="Copy Password">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="m-box">
+        <div class="l">Initial</div>
+        <div class="v">${Number(acc.initial_exp||0).toLocaleString()}</div>
+      </div>
+      <div class="m-box">
+        <div class="l">Current</div>
+        <div class="v">${curExp.toLocaleString()}</div>
+      </div>
+      <div class="m-box gain">
+        <div class="l">Gained</div>
+        <div class="v">+${Number(acc.gained_exp||0).toLocaleString()}</div>
+      </div>
+    </div>
+
+    <div class="prog">
+      <div class="prog-top">
+        <span>LEVEL ${level} → <b>L${nextLvl}</b></span>
+        <b>${remaining.toLocaleString()} LEFT</b>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct.toFixed(1)}%"></div></div>
+      <div class="prog-bot">
+        <span>${earned.toLocaleString()} / ${needed.toLocaleString()}</span>
+        <span class="pct">${pct.toFixed(1)}%</span>
+      </div>
+    </div>
+
+    <div class="acc-foot">
+      <span class="acc-time">
+        <i class="fa-regular fa-clock"></i>
+        <strong class="acc-uptime" data-uid="${esc(uid)}" data-uptime="${Math.floor(acc.uptime_seconds||0)}" data-paused="${acc.is_paused?1:0}">${fmtDur(acc.uptime_seconds||0)}</strong>
+      </span>
+      <div class="acc-actions">
+        <button class="a-btn" onclick="togglePause('${esc(uid)}')" title="${acc.is_paused?'Resume':'Pause'}"><i class="fa-solid ${acc.is_paused?'fa-play':'fa-pause'}"></i></button>
+        <button class="a-btn" onclick="restartAcc('${esc(uid)}')" title="Restart"><i class="fa-solid fa-rotate-right"></i></button>
+        <button class="a-btn" onclick="refreshAcc('${esc(uid)}')" title="Refresh"><i class="fa-solid fa-arrows-rotate"></i></button>
+        <button class="a-btn danger" onclick="deleteAccount('${esc(uid)}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAccounts(accounts){
+  const container = $('accounts-list');
+  $('badge-count').innerText = accounts.length;
+
+  const allPaused = accounts.length > 0 && accounts.every(a => a.is_paused || a.status === 'PAUSED');
+  const pb = $('pause-all');
+  pb.innerHTML = allPaused
+    ? '<i class="fa-solid fa-play"></i> Resume All'
+    : '<i class="fa-solid fa-pause"></i> Pause All';
+
+  if(accounts.length === 0){
+    container.innerHTML = `
+      <div class="empty">
+        <i class="fa-solid fa-ghost"></i>
+        <h3>No accounts yet</h3>
+        <p>Add your first account to start leveling up.</p>
+        <button class="btn primary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i>Add Account</button>
+      </div>`;
+    return;
+  }
+
+  const sortBy = ($('sort-select')?.value) || 'default';
+  const sorted = [...accounts].sort((a,b)=>{
+    if(sortBy === 'level-desc') return (b.level||0) - (a.level||0);
+    if(sortBy === 'level-asc') return (a.level||0) - (b.level||0);
+    if(sortBy === 'gain-desc') return (b.gained_exp||0) - (a.gained_exp||0);
+    if(sortBy === 'name-asc') return String(a.nickname||'').localeCompare(String(b.nickname||''));
+    return 0;
+  });
+
+  container.innerHTML = sorted.map(renderAccount).join('');
+  filterAccounts();
+}
+
+function setFilter(f, btn){
+  state.filter = f;
+  document.querySelectorAll('.filters button').forEach(x=>x.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  filterAccounts();
+}
+
+function filterAccounts(){
+  const q = ($('search-input')?.value || '').toLowerCase().trim();
+  document.querySelectorAll('.acc').forEach(card => {
+    const uid = (card.dataset.uid||'').toLowerCase();
+    const nick = (card.dataset.nick||'').toLowerCase();
+    const st = (card.dataset.status||'').toLowerCase();
+    const paused = card.dataset.paused === '1';
+    const matchSearch = !q || uid.includes(q) || nick.includes(q);
+    let matchFilter = true;
+    if(state.filter === 'match') matchFilter = st === 'match' && !paused;
+    else if(state.filter === 'online') matchFilter = (st === 'online' || st === 'match');
+    else if(state.filter === 'paused') matchFilter = paused;
+    else if(state.filter === 'error') matchFilter = st === 'error';
+    card.style.display = (matchSearch && matchFilter) ? '' : 'none';
+  });
+}
+
+function openCredModal(uid){
+  const acc = state.accounts.find(a => String(a.uid) === String(uid));
+  if(!acc){ toast('Account not found','error'); return; }
+  const gameId = acc.uid || uid;
+  const guestUid = acc.auth_uid || '';
+  const passVal = acc.auth_password || acc.password || '';
+  const tokenVal = acc.auth_token || '';
+
+  let rows = `
+    <div class="cred-row">
+      <span class="k">Nickname</span>
+      <span class="v">${esc(acc.nickname||'—')}</span>
+      <button class="reveal" onclick="copyText('${esc(acc.nickname||'')}','Nickname copied')"><i class="fa-regular fa-copy"></i></button>
+    </div>
+    <div class="cred-row">
+      <span class="k">Game ID</span>
+      <span class="v" style="color:var(--cyan-2);font-weight:700">${esc(gameId)}</span>
+      <button class="reveal" onclick="copyText('${esc(gameId)}','Game ID copied')"><i class="fa-regular fa-copy"></i></button>
+    </div>`;
+
+  if(guestUid){
+    rows += `
+    <div class="cred-row">
+      <span class="k">Guest UID</span>
+      <span class="v" style="color:var(--blue-2)">${esc(guestUid)}</span>
+      <button class="reveal" onclick="copyText('${esc(guestUid)}','Guest UID copied')"><i class="fa-regular fa-copy"></i></button>
+    </div>`;
+  }
+
+  if(passVal){
+    rows += `
+    <div class="cred-row">
+      <span class="k">Password</span>
+      <span class="v" id="pw-val" data-val="${esc(passVal)}">••••••••••</span>
+      <button class="reveal" onclick="togglePw(this)"><i class="fa-regular fa-eye"></i></button>
+      <button class="reveal" onclick="copyText('${esc(passVal)}','Password copied')"><i class="fa-regular fa-copy"></i></button>
+    </div>`;
+  } else {
+    rows += `<div class="cred-row"><span class="k">Password</span><span class="v" style="color:var(--t-4)">Not stored</span></div>`;
+  }
+
+  if(tokenVal){
+    rows += `
+    <div class="cred-row">
+      <span class="k">Token</span>
+      <span class="v" style="font-size:10.5px">${esc(tokenVal.slice(0,44))}…</span>
+      <button class="reveal" onclick="copyText('${esc(tokenVal)}','Token copied')"><i class="fa-regular fa-copy"></i></button>
+    </div>`;
+  }
+
+  rows += `
+    <div class="cred-row">
+      <span class="k">Region</span>
+      <span class="v">${esc(acc.region||'BD')}</span>
+    </div>
+    <div class="cred-row">
+      <span class="k">Level</span>
+      <span class="v">${acc.level||1}</span>
+    </div>
+    <div class="cred-row">
+      <span class="k">EXP</span>
+      <span class="v">${Number(acc.current_exp||0).toLocaleString()}</span>
+    </div>`;
+
+  $('cred-body').innerHTML = rows;
+  $('cred-modal').classList.add('active');
+}
+
+function closeCredModal(){ $('cred-modal').classList.remove('active'); }
+
+function togglePw(btn){
+  const el = $('pw-val');
+  if(!el) return;
+  const real = el.dataset.val;
+  const icon = btn.querySelector('i');
+  if(el.textContent.startsWith('•')){
+    el.textContent = real;
+    icon.className = 'fa-regular fa-eye-slash';
+  } else {
+    el.textContent = '••••••••••';
+    icon.className = 'fa-regular fa-eye';
+  }
+}
+
+function openAddModal(){ $('add-modal').classList.add('active'); }
+function closeAddModal(){ $('add-modal').classList.remove('active'); }
+function toggleFormType(){
+  const t = $('acc-type').value;
+  $('guest-inputs').style.display = t === 'guest' ? '' : 'none';
+  $('token-inputs').style.display = t === 'token' ? '' : 'none';
+}
+
+async function submitAddAccount(e){
+  e.preventDefault();
+  const type = $('acc-type').value;
+  let payload = {};
+  if(type === 'guest'){
+    const uid = $('acc-uid').value.trim();
+    const pass = $('acc-password').value.trim();
+    if(!uid || !pass){ toast('UID and password required','error'); return; }
+    payload = {uid, password: pass};
+  } else {
+    const token = $('acc-token').value.trim();
+    if(!token){ toast('Access token required','error'); return; }
+    payload = {token};
+  }
+  try{
+    const r = await fetch('/api/account/add', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if(d.status === 'ok'){ closeAddModal(); toast('Account added','success'); fetchStats(); }
+    else toast(d.error || 'Add failed','error');
+  }catch(e){ toast('Network error','error'); }
+}
+
+async function deleteAccount(uid){
+  if(!confirm(`Remove account ${uid}?`)) return;
+  try{
+    const r = await fetch('/api/account/delete', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({uid})
+    });
+    const d = await r.json();
+    if(d.status === 'ok'){ toast('Account removed','success'); fetchStats(); }
+    else toast(d.error || 'Delete failed','error');
+  }catch(e){ toast('Network error','error'); }
+}
+
+async function refreshAcc(uid){
+  toast(`Refreshing ${uid}…`,'info');
+  try{
+    await fetch('/api/account/refresh', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({uid})
+    });
+    setTimeout(fetchStats, 800);
+  }catch(e){ toast('Refresh failed','error'); }
+}
+
+async function restartAcc(uid){
+  toast(`Restarting ${uid}…`,'info');
+  try{
+    await fetch('/api/account/restart', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({uid})
+    });
+    setTimeout(fetchStats, 800);
+  }catch(e){ toast('Restart failed','error'); }
+}
+
+async function togglePause(uid){
+  try{
+    const r = await fetch('/api/account/pause', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({uid})
+    });
+    const d = await r.json();
+    if(d.status === 'ok'){
+      toast(d.is_paused ? `Paused ${uid}` : `Resumed ${uid}`, d.is_paused ? 'info' : 'success');
+      fetchStats();
+    } else toast(d.error || 'Failed','error');
+  }catch(e){ toast('Network error','error'); }
+}
+
+async function togglePauseAll(){
+  try{
+    const r = await fetch('/api/account/pause_all', {method:'POST'});
+    const d = await r.json();
+    if(d.status === 'ok'){
+      toast(d.all_paused ? 'All paused' : 'All resumed', d.all_paused ? 'info' : 'success');
+      fetchStats();
+    } else toast(d.error || 'Failed','error');
+  }catch(e){ toast('Network error','error'); }
+}
+
+function copyAllUids(){
+  const uids = state.accounts.map(a => a.auth_uid || a.uid).filter(Boolean);
+  if(!uids.length){ toast('No UIDs to copy','error'); return; }
+  copyText(uids.join('\n'), `${uids.length} UIDs copied`);
+}
+
+function setLogFilter(f, btn){
+  state.logFilter = f;
+  document.querySelectorAll('.cfilter').forEach(x=>{ if(x.id !== 'autoscroll-btn') x.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderLogs(state.logs);
+}
+
+function renderLogs(logs){
+  const stream = $('console-stream');
+  let list = logs || [];
+  if(state.logFilter === 'match') list = list.filter(l => String(l.message||'').toLowerCase().includes('match'));
+  else if(state.logFilter === 'success') list = list.filter(l => l.level === 'success' || String(l.message||'').includes('EXP'));
+  else if(state.logFilter === 'error') list = list.filter(l => l.level === 'error' || l.level === 'warning');
+
+  const tail = list.slice(-400);
+  stream.innerHTML = tail.map(l=>{
+    let cls = l.level || 'info';
+    const msg = String(l.message||'');
+    if(msg.toLowerCase().includes('match')) cls += ' match';
+    return `<div class="log ${esc(cls)}"><span class="t">[${esc(l.time||'00:00:00')}]</span><span class="m">${esc(msg)}</span></div>`;
+  }).join('');
+
+  if(state.autoScroll) stream.scrollTop = stream.scrollHeight;
+}
+
+async function clearLogs(){
+  try{
+    await fetch('/api/logs/clear', {method:'POST'});
+    state.logs = [];
+    renderLogs([]);
+    toast('Console cleared','info');
+  }catch(e){ toast('Clear failed','error'); }
+}
+
+function toggleAutoScroll(){
+  state.autoScroll = !state.autoScroll;
+  $('autoscroll-btn').classList.toggle('active', state.autoScroll);
+  if(state.autoScroll) $('console-stream').scrollTop = 999999;
+}
+
+function handleLogScroll(){
+  const s = $('console-stream');
+  if(s.scrollHeight - s.scrollTop - s.clientHeight > 80) state.autoScroll = false;
+  $('autoscroll-btn').classList.toggle('active', state.autoScroll);
+}
+
+async function fetchStats(){
+  try{
+    const r = await fetch('/api/stats');
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const accs = Array.isArray(d.accounts) ? d.accounts : [];
+    const logs = Array.isArray(d.logs) ? d.logs : [];
+
+    setText('st-acc', d.total_accounts ?? accs.length);
+    setText('st-started', d.total_matches_started || 0);
+    setText('st-exp', '+' + Number(d.total_gained_exp || 0).toLocaleString());
+
+    if(accs.length > 0){
+      const levels = accs.map(a => parseInt(a.level) || 1);
+      const avg = (levels.reduce((s,l)=>s+l,0) / levels.length).toFixed(1);
+      const max = Math.max(...levels);
+      setText('st-avg-level', avg);
+      setText('st-max-level', `Max L${max}`);
+    } else {
+      setText('st-avg-level', '0');
+      setText('st-max-level', 'Max L0');
+    }
+
+    const online = accs.filter(a => a.status === 'ONLINE' || a.status === 'IN_MATCH').length;
+    setText('st-online', online + ' online');
+
+    const uptimeH = Math.max(0.016, (d.uptime || 60) / 3600);
+    const perH = Math.round((d.total_matches_started || 0) / uptimeH);
+    setText('st-rate', '~' + perH + ' / hr');
+    setText('st-exp-rate', '~' + Number(d.exp_per_hour || 0).toLocaleString() + ' / hr');
+
+    const matchCount = d.total_matches_started || 0;
+    if(state.sound !== 'off' && matchCount > state.prevMatchCount && state.prevMatchCount > 0){
+      playAlert();
+    }
+    state.prevMatchCount = matchCount;
+
+    state.accounts = accs;
+    state.logs = logs;
+
+    renderAccounts(accs);
+    renderLogs(logs);
+  }catch(e){
+    console.warn('Stats fetch error:', e);
+    setText('sys-status', 'Connection issue');
+  }
+}
+
+function playAlert(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 880; o.type = 'sine';
+    g.gain.setValueAtTime(0.001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    o.start(); o.stop(ctx.currentTime + 0.45);
+  }catch(e){}
+}
+
+function toggleAutoRefresh(){
+  state.autoRefresh = !state.autoRefresh;
+  $('autorefresh-toggle').classList.toggle('active', state.autoRefresh);
+  if(state.autoRefresh){ startAutoRefresh(); toast('Auto-refresh enabled','success'); }
+  else { stopAutoRefresh(); toast('Auto-refresh disabled','info'); }
+  saveSettings();
+}
+
+function startAutoRefresh(){
+  stopAutoRefresh();
+  if(!state.autoRefresh || state.refreshInterval <= 0) return;
+  state.refreshTimer = setInterval(fetchStats, state.refreshInterval);
+}
+
+function stopAutoRefresh(){
+  if(state.refreshTimer){ clearInterval(state.refreshTimer); state.refreshTimer = null; }
+}
+
+function setRefreshInterval(sec){
+  state.refreshInterval = parseInt(sec) * 1000;
+  if(state.refreshInterval <= 0){
+    state.autoRefresh = false;
+    $('autorefresh-toggle').classList.remove('active');
+    stopAutoRefresh();
+  } else if(state.autoRefresh){ startAutoRefresh(); }
+  saveSettings();
+}
+
+function setSoundAlert(v){ state.sound = v; saveSettings(); }
+
+function openSettings(){ $('settings-modal').classList.add('active'); }
+function closeSettings(){ $('settings-modal').classList.remove('active'); }
+
+function saveSettings(){
+  try{
+    localStorage.setItem('mahir_settings', JSON.stringify({
+      autoRefresh: state.autoRefresh,
+      refreshInterval: state.refreshInterval,
+      sound: state.sound
+    }));
+  }catch(e){}
+}
+
+function loadSettings(){
+  try{
+    const s = JSON.parse(localStorage.getItem('mahir_settings') || '{}');
+    if(s.autoRefresh !== undefined) state.autoRefresh = s.autoRefresh;
+    if(s.refreshInterval) state.refreshInterval = s.refreshInterval;
+    if(s.sound) state.sound = s.sound;
+    $('refresh-interval').value = String(Math.round(state.refreshInterval/1000)) || '3';
+    $('sound-alert').value = state.sound;
+    $('autorefresh-toggle').classList.toggle('active', state.autoRefresh);
+  }catch(e){}
+}
+
+function openPalette(){
+  $('palette').classList.add('active');
+  $('palette-input').value = '';
+  $('palette-input').focus();
+  renderPalette();
+}
+function closePalette(){ $('palette').classList.remove('active'); }
+
+function buildPaletteItems(){
+  const q = $('palette-input').value.toLowerCase();
+  const cmds = [
+    {icon:'fa-plus', label:'Add Account', fn:openAddModal},
+    {icon:'fa-rotate', label:'Refresh Now', fn:manualRefresh},
+    {icon:'fa-power-off', label:(state.autoRefresh?'Disable':'Enable')+' Auto-refresh', fn:toggleAutoRefresh},
+    {icon:'fa-pause', label:'Pause All Accounts', fn:togglePauseAll},
+    {icon:'fa-copy', label:'Copy All UIDs', fn:copyAllUids},
+    {icon:'fa-trash', label:'Clear Console', fn:clearLogs},
+    {icon:'fa-sliders', label:'Open Settings', fn:openSettings},
+    {icon:'fa-gauge-high', label:'Show Dashboard', fn:()=>switchView('dashboard', document.querySelectorAll('.nav-item')[0])},
+    {icon:'fa-users', label:'Show Accounts', fn:()=>switchView('accounts', document.querySelectorAll('.nav-item')[1])},
+    {icon:'fa-terminal', label:'Show Console', fn:()=>switchView('console', document.querySelectorAll('.nav-item')[2])},
+  ];
+  state.accounts.slice(0, 10).forEach(a => {
+    cmds.push({
+      icon:'fa-user',
+      label:`${a.nickname||a.uid} — Game ${a.uid}${a.auth_uid?' • Guest '+a.auth_uid:''}`,
+      fn:()=>openCredModal(a.uid)
+    });
+  });
+  return cmds.filter(c => !q || c.label.toLowerCase().includes(q));
+}
+
+function renderPalette(){
+  const items = buildPaletteItems();
+  state.paletteItems = items;
+  state.paletteIndex = 0;
+  $('palette-list').innerHTML = items.map((it,i)=>`
+    <div class="palette-item ${i===0?'sel':''}" onclick="runPaletteItem(${i})">
+      <i class="fa-solid ${it.icon}"></i>
+      <span>${esc(it.label)}</span>
+    </div>
+  `).join('');
+}
+
+function runPaletteItem(i){
+  const it = state.paletteItems[i];
+  if(it){ closePalette(); setTimeout(it.fn, 80); }
+}
+
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey||e.metaKey) && e.key === 'k'){ e.preventDefault(); openPalette(); }
+  if(e.key === 'Escape'){ closePalette(); closeAddModal(); closeCredModal(); closeSettings(); toggleSidebar(); }
+  if($('palette').classList.contains('active')){
+    const list = state.paletteItems;
+    if(e.key === 'ArrowDown'){ e.preventDefault(); state.paletteIndex = (state.paletteIndex + 1) % list.length; updatePaletteSel(); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); state.paletteIndex = (state.paletteIndex - 1 + list.length) % list.length; updatePaletteSel(); }
+    else if(e.key === 'Enter'){ e.preventDefault(); runPaletteItem(state.paletteIndex); }
+  }
+});
+
+function updatePaletteSel(){
+  document.querySelectorAll('.palette-item').forEach((el,i)=>{
+    el.classList.toggle('sel', i === state.paletteIndex);
+    if(i === state.paletteIndex) el.scrollIntoView({block:'nearest'});
+  });
+}
+
+setInterval(()=>{
+  document.querySelectorAll('.acc-uptime').forEach(u=>{
+    if(u.dataset.paused === '1') return;
+    let v = parseInt(u.dataset.uptime||'0') + 1;
+    u.dataset.uptime = v;
+    u.textContent = fmtDur(v);
+  });
+}, 1000);
+
+function manualRefresh(){ fetchStats(); toast('Refreshed','info'); }
+
+(function init(){
+  loadSettings();
+  fetchStats();
+  startAutoRefresh();
+  setInterval(fetchStats, 3000);
+})();
+</script>
+</body>
+</html>
