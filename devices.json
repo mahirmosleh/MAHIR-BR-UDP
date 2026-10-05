@@ -1,15 +1,15 @@
 {
-    "4311822408": {
-        "unique_device_id": "Google|dc333011-b204-44d1-bd89-9e7ace82c8d4",
-        "brand": "OPPO",
-        "model": "CPH2611",
-        "gpu_renderer": "Adreno (TM) 720",
-        "system_software": "Android OS 14 / API-34",
-        "screen_width": 720,
-        "screen_height": 2400,
-        "screen_dpi": "373",
-        "memory": 5905,
-        "processor_details": "ARM64 FP ASIMD AES VMH | 2822 | 10",
-        "client_ip": "112.40.127.19"
+    "8012335281": {
+        "unique_device_id": "Google|3c6b3f57-93a2-4be6-afed-006be760a6d9",
+        "brand": "Samsung",
+        "model": "SM-G998B",
+        "gpu_renderer": "Adreno (TM) 660",
+        "system_software": "Android OS 12 / API-31",
+        "screen_width": 1080,
+        "screen_height": 1600,
+        "screen_dpi": "380",
+        "memory": 5751,
+        "processor_details": "ARM64 FP ASIMD AES VMH | 2351 | 6",
+        "client_ip": "115.161.210.250"
     }
 }
